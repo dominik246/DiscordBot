@@ -5,20 +5,23 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 
 namespace DiscordBot.Commands
 {
-    public class CommandHandler
+    public class CommandHandlingService
     {
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
+        private readonly IServiceProvider _services;
 
-        public CommandHandler(DiscordSocketClient client, CommandService commands)
+        public CommandHandlingService(IServiceProvider services, CommandService commands, DiscordSocketClient client)
         {
             _commands = commands;
             _client = client;
+            _services = services;
         }
 
         public async Task InstallCommandsAsync()
@@ -34,7 +37,7 @@ namespace DiscordBot.Commands
             //
             // If you do not use Dependency Injection, pass null.
             // See Dependency Injection guide for more information.
-            await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(), services: null);
+            await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(), services: _services);
         }
 
         private async Task HandleCommandAsync(SocketMessage messageParam)
@@ -64,7 +67,7 @@ namespace DiscordBot.Commands
             IResult result = await _commands.ExecuteAsync(
                 context: context,
                 argPos: argPos,
-                services: null);
+                services: _services);
 
             // Optionally, we may inform the user if the command fails
             // to be executed; however, this may not always be desired,
@@ -76,7 +79,7 @@ namespace DiscordBot.Commands
                 if (!delay && !result.IsSuccess)
                 {
                     context.Channel.SendMessageAsync(result.ErrorReason);
-                    Task.Delay(5000);
+                    Thread.Sleep(5000);
                     delay = true;
                 }
             });
