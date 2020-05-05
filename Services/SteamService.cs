@@ -1,11 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
+
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DiscordBot.Services
@@ -36,14 +33,17 @@ namespace DiscordBot.Services
 
             await Task.Run(() =>
             {
-                foreach (dynamic item in data["items"])
+                if (data["items"] != null)
                 {
-                    if (item["link"].ToString().StartsWith("https://store.steampowered.com/app/"))
+                    foreach (dynamic item in data["items"])
                     {
-                        itemList.Add(item["link"].ToString());
+                        if (item["link"].ToString().StartsWith("https://store.steampowered.com/app/"))
+                        {
+                            itemList.Add(item["link"].ToString());
+                            break;
+                        }
                     }
                 }
-                Console.WriteLine(itemList[0]);
             });
 
             return itemList;

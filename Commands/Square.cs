@@ -1,7 +1,6 @@
 ﻿using Discord.Commands;
+
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DiscordBot.Commands
@@ -10,9 +9,16 @@ namespace DiscordBot.Commands
     {
         [Command("square")]
         [Summary("Squares a given number.")]
-        public async Task SquareAsync([Summary("The number to square")] int num)
+        public async Task SquareAsync([Summary("The number to square")] string num)
         {
-            await ReplyAsync($"{num}^2 = {Math.Pow(num, 2)}");
+            if (int.TryParse(num, out int result))
+            {
+                await ReplyAsync($"{result}^2 = {Math.Pow(result, 2)}");
+            }
+            else
+            {
+                await ReplyAsync("Not a number.");
+            }
         }
     }
 }

@@ -1,9 +1,7 @@
-﻿using Discord.Audio.Streams;
-using Discord.Commands;
+﻿using Discord.Commands;
+
 using DiscordBot.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
 using System.Threading.Tasks;
 
 namespace DiscordBot.Commands
@@ -14,12 +12,22 @@ namespace DiscordBot.Commands
         [Summary("Returns a steam game.")]
         public async Task SteamAsync([Summary("Game to search.")][Remainder] string game)
         {
-            Console.WriteLine(game);
             var result = new SteamService().GetInfo(game);
-            
-            string x = result[0];
+            string x = "";
 
-            await ReplyAsync(x);
+            try
+            {
+                x = result[0];
+            }
+            catch
+            {
+                x = "Game not found. Weird.";
+            }
+            finally
+            {
+                await ReplyAsync(x);
+            }
+
         }
     }
 }

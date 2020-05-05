@@ -1,13 +1,12 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+
 using DiscordBot.Commands;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DiscordBot
@@ -18,7 +17,10 @@ namespace DiscordBot
 
         public async Task MainAsync()
         {
-            _client = new DiscordSocketClient();
+            _client = new DiscordSocketClient(new DiscordSocketConfig
+            {
+                ExclusiveBulkDelete = true
+            });
             _client.Log += Log;
 
             var services = BuildServiceProvider();
@@ -34,7 +36,7 @@ namespace DiscordBot
             }
             catch (Exception ex)
             {
-                await Log(new LogMessage(LogSeverity.Critical, ex.Source, ex.Message));
+                await Log(new LogMessage(LogSeverity.Info, ex.Source, ex.Message));
             }
             finally
             {
@@ -53,7 +55,6 @@ namespace DiscordBot
             .AddSingleton(_client)
             .AddSingleton<CommandService>()
             .AddSingleton<CommandHandlingService>()
-            .AddSingleton<WebClient>()
             .BuildServiceProvider();
 
     }
