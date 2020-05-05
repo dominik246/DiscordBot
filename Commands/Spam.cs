@@ -11,17 +11,17 @@ namespace DiscordBot.Commands
     public class Spam : ModuleBase<SocketCommandContext>
     {
         [Command("spam", RunMode = RunMode.Async)]
-        [Name("spam <amount>")]
+        [Name("spam")]
         [Summary("Spams random stuff in the given channel.")]
         [RequireBotPermission(Discord.GuildPermission.ManageMessages)]
         [RequireUserPermission(Discord.GuildPermission.ManageMessages)]
-        public async Task SpamAsync(int num)
+        public async Task SpamAsync()
         {
             List<string> linesList = GetRandomString();
             foreach (string line in linesList)
             {
                 Thread.Sleep(1200);
-                string prefix = $"{line.Length} => ";
+                string prefix = $"";
 
                 await ReplyAsync(prefix + line);
             }
@@ -69,11 +69,6 @@ namespace DiscordBot.Commands
             {
                 linesList.Add(line[0..maxIndex]);
                 line = line.Remove(0, maxIndex);
-            }
-            foreach (string test in linesList)
-            {
-                Console.WriteLine(test.Length);
-                Console.WriteLine(test);
             }
             return linesList;
         }
