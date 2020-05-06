@@ -1,10 +1,10 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+
 using DiscordBot.Services;
-using System;
+
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace DiscordBot.Commands
@@ -54,7 +54,7 @@ namespace DiscordBot.Commands
                     originalAuthor = _commandService.Message.Author.Id;
                     originalMessage = _commandService.Message.Content;
                 }
-                    
+
                 // Makes sure it only runs once in the lifetime of the command
                 if (index.Equals(0))
                 {
@@ -78,7 +78,7 @@ namespace DiscordBot.Commands
                     {
                         reply = "Game not found. Weird.";
                         break;
-                    } 
+                    }
                 }
 
                 // Will only execute if we got a reply from the same user

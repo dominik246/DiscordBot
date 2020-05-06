@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 
 using System;
 using System.Collections.Generic;
@@ -45,12 +44,12 @@ namespace DiscordBot.Commands
                     }
                     else
                     {
-                        foreach(IMessage msg in getLast100Messages)
+                        foreach (IMessage msg in getLast100Messages)
                         {
                             ulong authorId = msg.Author.Id;
                             ulong resultMsg = msg.Id;
 
-                            if(authorId.Equals(num))
+                            if (authorId.Equals(num))
                             {
                                 await Context.Channel.DeleteMessageAsync(resultMsg);
                                 counter++;

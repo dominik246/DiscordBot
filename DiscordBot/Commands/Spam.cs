@@ -71,7 +71,7 @@ namespace DiscordBot.Commands
 
             Console.WriteLine(line);
             Console.WriteLine($"{line.Length}");
-            
+
             Console.WriteLine($"{line}");
             List<string> linesList = new List<string>();
 
@@ -90,9 +90,9 @@ namespace DiscordBot.Commands
                             maxIndex++;
                         }
 
-                        linesList.Add(line[0..(maxIndex+1)]);
+                        linesList.Add(line[0..(maxIndex + 1)]);
                         line = line.Remove(0, maxIndex + 1);
-                    } 
+                    }
                 });
             return linesList;
         }

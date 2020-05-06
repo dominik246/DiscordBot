@@ -22,7 +22,7 @@ namespace DiscordBot.Services
             // -> fill in "Sites to search"
             // -> when created, open the new CSE link and under "Search engine ID" click "Copy to clipboard"
             string cseToken = Environment.GetEnvironmentVariable("GoogleCSEToken");
-            
+
             // Because we use google search engine, it doesn't like when you type spaces and hashtags,
             // so we have to take care we don't input that
             string queryTerm = userInput.Replace(' ', '+').Replace("#", "%23");

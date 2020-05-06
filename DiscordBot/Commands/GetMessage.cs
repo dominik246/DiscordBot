@@ -1,9 +1,8 @@
 ﻿using Discord;
 using Discord.Commands;
-using System;
+
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DiscordBot.Commands
@@ -16,10 +15,10 @@ namespace DiscordBot.Commands
         [RequireBotPermission(GuildPermission.ViewChannel)]
         public async Task GetNthMessage(int num)
         {
-            if(num > 100)
+            if (num > 100)
             {
                 await ReplyAsync("Number has to be less than 101");
-                
+
             }
             else
             {
