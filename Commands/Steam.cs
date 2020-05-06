@@ -1,7 +1,7 @@
 ﻿using Discord.Commands;
 
 using DiscordBot.Services;
-
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DiscordBot.Commands
@@ -9,23 +9,26 @@ namespace DiscordBot.Commands
     public class Steam : ModuleBase<SocketCommandContext>
     {
         [Command("steam")]
+        [Name("steam <game to search>")]
         [Summary("Returns a steam game.")]
         public async Task SteamAsync([Summary("Game to search.")][Remainder] string game)
         {
-            var result = new SteamService().GetInfo(game);
-            string x = "";
+            SteamService ss = new SteamService();
+            List<string> result = await ss.GetInfo(game);
+
+            string reply = "";
 
             try
             {
-                x = result[0];
+                reply = result[0];
             }
             catch
             {
-                x = "Game not found. Weird.";
+                reply = "Game not found. Weird.";
             }
             finally
             {
-                await ReplyAsync(x);
+                await ReplyAsync(reply);
             }
 
         }

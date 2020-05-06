@@ -9,35 +9,55 @@ namespace DiscordBot.Services
 {
     public class SteamService
     {
-        public List<string> GetInfo(string userInput, bool restrict = false)
+        public async Task<List<string>> GetInfo(string userInput, bool restrict = false)
         {
-            string api = Environment.GetEnvironmentVariable("GoogleAPIToken");
-            string cx = Environment.GetEnvironmentVariable("GoogleCSE");
-            string query = userInput.Replace(' ', '+').Replace("#", "%23");
-            string querySuffix = "+site:store.steampowered.com/app";
+            // Google API key, you can get it here: https://console.developers.google.com/apis/credentials
+            // -> click "Create Credentials"
+            // -> "API Key"
+            string apiKey = Environment.GetEnvironmentVariable("GoogleAPIToken");
+
+            // Google CSE Token, you can get it here: https://cse.google.com/cse/all
+            // -> click "Add"
+            // -> fill in "Sites to search"
+            // -> when created, open the new CSE link and under "Search engine ID" click "Copy to clipboard"
+            string cseToken = Environment.GetEnvironmentVariable("GoogleCSEToken");
+            
+            // Because we use google search engine, it doesn't like when you type spaces and hashtags,
+            // so we have to take care we don't input that
+            string queryTerm = userInput.Replace(' ', '+').Replace("#", "%23");
+
+            // Ensuring we only get applications from steam, and not tags, search terms, franchises or anything else
+            string querySuffix = "+site:store.steampowered.com/app/";
+
+            // Siterestrict is for the ppl who want to pay for query searches, I don't see a reason why to
             string suffix = "/siterestrict";
             string address = "https://www.googleapis.com/customsearch/v1";
-            string fullAddress = address + (restrict ? suffix : "") + "?key=" + api + "&cx=" + cx + "&q=" + query + querySuffix;
+            string json = "";
+            string fullAddress = address + (restrict ? suffix : "") + "?key=" + apiKey + "&cx=" + cseToken +
+                "&q=" + queryTerm + querySuffix;
 
-            using (HttpClient wc = new HttpClient())
+            using (HttpClient hc = new HttpClient())
             {
-                string json = wc.GetStringAsync(fullAddress).Result;
+                await Task.Run(() => json = hc.GetStringAsync(fullAddress).Result);
                 return JsonParser(json).Result;
             }
         }
 
         private async Task<List<string>> JsonParser(string json)
         {
-            dynamic data = JObject.Parse(json);
+            JObject data = JObject.Parse(json);
             List<string> itemList = new List<string>();
 
             await Task.Run(() =>
             {
                 if (data["items"] != null)
                 {
-                    foreach (dynamic item in data["items"])
+                    foreach (JObject item in data["items"])
                     {
-                        if (item["link"].ToString().StartsWith("https://store.steampowered.com/app/"))
+                        // Need to be sure it's a valid steam game link, also Steam game links end with a "/" 
+                        // for some reason
+                        if (item["link"].ToString().StartsWith("https://store.steampowered.com/app/") 
+                            && item["link"].ToString().EndsWith("//"))
                         {
                             itemList.Add(item["link"].ToString());
                             break;

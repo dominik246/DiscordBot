@@ -11,25 +11,36 @@ namespace DiscordBot.Commands
     public class Spam : ModuleBase<SocketCommandContext>
     {
         [Command("spam", RunMode = RunMode.Async)]
-        [Name("spam")]
+        [Name("spam [optional]<amount>")]
         [Summary("Spams random stuff in the given channel.")]
         [RequireBotPermission(Discord.GuildPermission.ManageMessages)]
         [RequireUserPermission(Discord.GuildPermission.ManageMessages)]
-        public async Task SpamAsync()
+        public async Task SpamAsync(uint num = 5)
         {
-            List<string> linesList = GetRandomString();
+            List<string> linesList = new List<string>();
+            await Task.Run(() =>
+            {
+                while (linesList.Count < num)
+                {
+                    foreach (string s in GetRandomString().Result)
+                    {
+                        linesList.Add(s);
+                    }
+                }
+            });
+
             foreach (string line in linesList)
             {
-                Thread.Sleep(1200);
                 string prefix = $"";
 
                 await ReplyAsync(prefix + line);
+                Thread.Sleep(1000);
             }
             await ReplyAsync("``Finished!``");
         }
 
         private static Random random = new Random();
-        private static List<string> GetRandomString()
+        private async Task<List<string>> GetRandomString()
         {
             string solutionFolderPath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
             FileStream fs = new FileStream(solutionFolderPath + "//json//shakespeare_6.0_unformated_fixed.json.txt", FileMode.Open);
@@ -58,18 +69,31 @@ namespace DiscordBot.Commands
             sr.Close();
             fs.Close();
 
-            int maxIndex = 127;
-            if (line.Length < maxIndex)
-            {
-                maxIndex = line.Length - 1;
-            }
-
+            Console.WriteLine(line);
+            Console.WriteLine($"{line.Length}");
+            
+            Console.WriteLine($"{line}");
             List<string> linesList = new List<string>();
-            while (line.Length > maxIndex)
-            {
-                linesList.Add(line[0..maxIndex]);
-                line = line.Remove(0, maxIndex);
-            }
+
+            await Task.Run(() =>
+                {
+                    int maxIndex = 127;
+                    while (line.Length > 0)
+                    {
+                        if (line.Length < maxIndex)
+                        {
+                            maxIndex = line.Length - 1;
+                        }
+
+                        while (char.IsLetterOrDigit(line[maxIndex]))
+                        {
+                            maxIndex++;
+                        }
+
+                        linesList.Add(line[0..(maxIndex+1)]);
+                        line = line.Remove(0, maxIndex + 1);
+                    } 
+                });
             return linesList;
         }
     }
