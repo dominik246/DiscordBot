@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -9,7 +10,7 @@ namespace DiscordBot.Services
 {
     public class SteamService
     {
-        public async Task<List<string>> GetInfo(string userInput, bool restrict = false)
+        public async Task<List<(string, string)>> GetInfo(string userInput, bool restrict = false)
         {
             // Google API key, you can get it here: https://console.developers.google.com/apis/credentials
             // -> click "Create Credentials"
@@ -35,6 +36,7 @@ namespace DiscordBot.Services
             string json = "";
             string fullAddress = address + (restrict ? suffix : "") + "?key=" + apiKey + "&cx=" + cseToken +
                 "&q=" + queryTerm + querySuffix;
+            Console.WriteLine(fullAddress);
 
             using (HttpClient hc = new HttpClient())
             {
@@ -43,10 +45,10 @@ namespace DiscordBot.Services
             }
         }
 
-        private async Task<List<string>> JsonParser(string json)
+        private async Task<List<(string, string)>> JsonParser(string json)
         {
             JObject data = JObject.Parse(json);
-            List<string> itemList = new List<string>();
+            List<(string, string)> itemList = new List<(string, string)>();
 
             await Task.Run(() =>
             {
@@ -57,8 +59,9 @@ namespace DiscordBot.Services
                         // Need to be sure it's a valid steam game link
                         if (item["link"].ToString().StartsWith("https://store.steampowered.com/app/"))
                         {
-                            itemList.Add(item["link"].ToString());
-                            break;
+                            string name = item["pagemap"]["product"].First()["name"].ToString();
+
+                            itemList.Add((name, item["link"].ToString()));
                         }
                     }
                 }

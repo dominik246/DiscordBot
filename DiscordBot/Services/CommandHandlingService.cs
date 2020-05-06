@@ -13,6 +13,7 @@ namespace DiscordBot.Commands
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
+        public SocketUserMessage Message { get; set; }
 
         public CommandHandlingService(IServiceProvider services, CommandService commands, DiscordSocketClient client)
         {
@@ -40,21 +41,21 @@ namespace DiscordBot.Commands
         private async Task HandleCommandAsync(SocketMessage messageParam)
         {
             // Don't process the command if it was a system message
-            SocketUserMessage message = messageParam as SocketUserMessage;
-            if (message == null)
+            Message = messageParam as SocketUserMessage;
+            if (Message == null)
                 return;
 
             // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-            if (!(message.HasCharPrefix('!', ref argPos) ||
-                message.HasMentionPrefix(_client.CurrentUser, ref argPos)) ||
-                message.Author.IsBot)
+            if (!(Message.HasCharPrefix('!', ref argPos) ||
+                Message.HasMentionPrefix(_client.CurrentUser, ref argPos)) ||
+                Message.Author.IsBot)
                 return;
 
             // Create a WebSocket-based command context based on the message
-            var context = new SocketCommandContext(_client, message);
+            var context = new SocketCommandContext(_client, Message);
 
             // Execute the command with the command context we just
             // created, along with the service provider for precondition checks.
