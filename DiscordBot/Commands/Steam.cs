@@ -11,7 +11,7 @@ namespace DiscordBot.Commands
 {
     public class Steam : ModuleBase<SocketCommandContext>
     {
-        private CommandHandlingService _commandService;
+        private readonly CommandHandlingService _commandService;
 
         public Steam(CommandHandlingService commandService)
         {
@@ -34,8 +34,8 @@ namespace DiscordBot.Commands
             ulong originalAuthor = 0;
             string originalMessage = "";
             string newMessage = "";
-            ulong firstGarbageMessage = 0;
-            ulong secondGarbageMessage = 0;
+            ulong firstDisposableMessage = 0;
+            ulong secondDisposableMessage = 0;
 
             // Searches for possible matches on steam and returns a list of them
             List<(string, string)> result = await ss.GetInfo(game);
@@ -49,7 +49,7 @@ namespace DiscordBot.Commands
                     newMessage = _commandService.Message.Content;
                 }
                 // Only executes once so that it sets the user who originally initialized the command
-                if (!_commandService.Message.Author.IsBot && originalAuthor == 0 && originalMessage == "")
+                if (!_commandService.Message.Author.IsBot && originalAuthor == 0 && string.IsNullOrEmpty(originalMessage))
                 {
                     originalAuthor = _commandService.Message.Author.Id;
                     originalMessage = _commandService.Message.Content;
@@ -65,13 +65,13 @@ namespace DiscordBot.Commands
                         await Task.Run(async () =>
                         {
                             eb.WithTitle("Result of steam search:");
-                            foreach (var s in result)
+                            foreach ((string, string) s in result)
                             {
                                 eb.AddField($"{++index}) ", s.Item1);
                             }
                             eb.WithColor(Color.Green);
                             await ReplyAsync(message: "Which one?", embed: eb.Build());
-                            firstGarbageMessage = _commandService.Message.Id;
+                            firstDisposableMessage = _commandService.Message.Id;
                         });
                     }
                     else
@@ -87,7 +87,7 @@ namespace DiscordBot.Commands
                     // Checks if it's a number and if the number is in the list
                     if (int.TryParse(_commandService.Message.Content, out int answer))
                     {
-                        secondGarbageMessage = _commandService.Message.Id;
+                        secondDisposableMessage = _commandService.Message.Id;
                         if (answer < result.Count)
                         {
                             reply = result[answer - 1].Item2;
@@ -107,8 +107,8 @@ namespace DiscordBot.Commands
                 }
             }
             // Cleanup after task is done
-            await Context.Channel.DeleteMessageAsync(firstGarbageMessage);
-            await Context.Channel.DeleteMessageAsync(secondGarbageMessage);
+            await Context.Channel.DeleteMessageAsync(firstDisposableMessage);
+            await Context.Channel.DeleteMessageAsync(secondDisposableMessage);
 
             // Finally replys the link of the query
             await ReplyAsync(reply);
