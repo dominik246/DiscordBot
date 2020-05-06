@@ -54,10 +54,8 @@ namespace DiscordBot.Services
                 {
                     foreach (JObject item in data["items"])
                     {
-                        // Need to be sure it's a valid steam game link, also Steam game links end with a "/" 
-                        // for some reason
-                        if (item["link"].ToString().StartsWith("https://store.steampowered.com/app/") 
-                            && item["link"].ToString().EndsWith("//"))
+                        // Need to be sure it's a valid steam game link
+                        if (item["link"].ToString().StartsWith("https://store.steampowered.com/app/"))
                         {
                             itemList.Add(item["link"].ToString());
                             break;

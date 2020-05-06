@@ -30,7 +30,7 @@ namespace DiscordBot.Commands
                     IReadOnlyCollection<IMessage> getLast100Messages = await Context.Channel.GetMessagesAsync().LastAsync();
 
                     // Ensures that message length of numMsg is greater than 0, therefore ensures that the message exists
-                    if (msgId.Content.Length > 0)
+                    if (msgId?.Content.Length > 0)
                     {
                         do
                         {
