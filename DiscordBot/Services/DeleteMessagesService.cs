@@ -19,7 +19,7 @@ namespace DiscordBot.DiscordBot.Services
                 int counter = 0;
                 ulong latestMessageId = 0;
                 IMessage msgId = await commandService.Message.Channel.GetMessageAsync(num);
-                IReadOnlyCollection<IMessage> getLastNMessages = await commandService.Message.Channel.GetMessagesAsync(n).LastAsync();
+                IReadOnlyCollection<IMessage> getLast100Messages = await commandService.Message.Channel.GetMessagesAsync().LastAsync();
 
                 // Ensures that message length of numMsg is greater than 0, therefore ensures that the message exists
                 if (msgId?.Content.Length > 0)
@@ -27,8 +27,8 @@ namespace DiscordBot.DiscordBot.Services
                     do
                     {
                         // Automagically gets the latest message from the channel and deletes it
-                        latestMessageId = getLastNMessages.ElementAt(counter).Id;
-                        await getLastNMessages.ElementAt(counter).DeleteAsync();
+                        latestMessageId = getLast100Messages.ElementAt(counter).Id;
+                        await getLast100Messages.ElementAt(counter).DeleteAsync();
                         Thread.Sleep(500);
                         counter++;
                     } while (latestMessageId != num);
@@ -37,7 +37,7 @@ namespace DiscordBot.DiscordBot.Services
                 }
                 else
                 {
-                    foreach (IMessage msg in getLastNMessages)
+                    foreach (IMessage msg in getLast100Messages)
                     {
                         ulong authorId = msg.Author.Id;
                         ulong resultMsg = msg.Id;
@@ -45,10 +45,17 @@ namespace DiscordBot.DiscordBot.Services
                         if (authorId.Equals(num))
                         {
                             await commandService.Message.Channel.DeleteMessageAsync(resultMsg);
+                            Thread.Sleep(500);
                             counter++;
                         }
+                        if (n.Equals(counter))
+                        {
+                            // Counter is still by 1 short because it iterates from 0
+                            counter++;
+                            break;
+                        }
                     }
-                    reply = $"Successfully deleted {counter} messages.";
+                    reply = $"Successfully deleted {counter + 1} messages.";
                 }
                 if (counter == 0)
                 {
