@@ -3,7 +3,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace DiscordBot.DiscordBot.Commands
@@ -23,22 +22,23 @@ namespace DiscordBot.DiscordBot.Commands
         [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task VanishAsync()
         {
-            string reply = string.Empty;
+            string reply = "Changing bot status to: ";
             ulong originalMessageId = Context.Message.Id;
             bool isCompleted = false;
 
             if (_client.Status.Equals(UserStatus.Online) && !isCompleted)
             {
                 isCompleted = true;
-                Console.WriteLine("Changing bot status to: Invisible");
+                reply += "Invisible";
                 await _client.SetStatusAsync(UserStatus.Invisible);
             }
             if (_client.Status.Equals(UserStatus.Invisible) && !isCompleted)
             {
                 isCompleted = true;
-                Console.WriteLine("Changing bot status to: Online");
+                reply += "Online";
                 await _client.SetStatusAsync(UserStatus.Online);
             }
+            Console.WriteLine(reply);
             await Context.Channel.DeleteMessageAsync(originalMessageId);
         }
     }

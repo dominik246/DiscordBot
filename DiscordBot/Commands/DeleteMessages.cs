@@ -1,67 +1,43 @@
 ﻿using Discord;
 using Discord.Commands;
 
+using DiscordBot.DiscordBot.Services;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace DiscordBot.Commands
 {
     public class DeleteMessages : ModuleBase<SocketCommandContext>
     {
+        private readonly CommandHandlingService _commandService;
+        public DeleteMessages(CommandHandlingService commandService)
+        {
+            _commandService = commandService;
+        }
+
         [Command("delete", RunMode = RunMode.Async)]
-        [Name("delete <amount>")]
-        [Summary("Deletes a specified amount of messages based on the message ID provided.")]
+        [Name("delete <amount>/<untilId>/<userId>")]
+        [Summary("Deletes a specified amount of messages based on the ID or amount provided.")]
         [RequireBotPermission(GuildPermission.ManageMessages)]
         [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task DeleteAsync(ulong num)
         {
             string reply = "";
+            int counter = 100;
+            DeleteMessagesService dms = new DeleteMessagesService();
             try
             {
-                await Task.Run(async () =>
+                // If the user types a count and not an ID, it converts the count to the specified ID and continues
+                if (num <= 100)
                 {
-                    int counter = 0;
-                    ulong latestMessageId = 0;
-                    IMessage msgId = await Context.Channel.GetMessageAsync(num);
-                    IReadOnlyCollection<IMessage> getLast100Messages = await Context.Channel.GetMessagesAsync().LastAsync();
-
-                    // Ensures that message length of numMsg is greater than 0, therefore ensures that the message exists
-                    if (msgId?.Content.Length > 0)
-                    {
-                        do
-                        {
-                            // Automagically gets the latest message from the channel and deletes it
-                            latestMessageId = getLast100Messages.ElementAt(counter).Id;
-                            await getLast100Messages.ElementAt(counter).DeleteAsync();
-                            Thread.Sleep(300);
-                            counter++;
-                        } while (latestMessageId != num);
-
-                        reply = $"Successfully deleted {counter} messages.";
-                    }
-                    else
-                    {
-                        foreach (IMessage msg in getLast100Messages)
-                        {
-                            ulong authorId = msg.Author.Id;
-                            ulong resultMsg = msg.Id;
-
-                            if (authorId.Equals(num))
-                            {
-                                await Context.Channel.DeleteMessageAsync(resultMsg);
-                                counter++;
-                                reply = $"Successfully deleted {counter} messages.";
-                            }
-                        }
-                    }
-                    if (counter == 0)
-                    {
-                        reply = "0 messages found. Have you entered a valid message/user ID?";
-                    }
-                });
+                    IReadOnlyCollection<IMessage> message = await Context.Channel.GetMessagesAsync((int)num).LastAsync();
+                    counter = (int)num;
+                    num = message.Last().Id;
+                }
+                reply = await dms.DeleteTaskAsync(_commandService, num, counter);
             }
             catch (Exception ex)
             {

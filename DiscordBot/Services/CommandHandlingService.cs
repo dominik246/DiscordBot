@@ -14,6 +14,7 @@ namespace DiscordBot.Commands
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
         public SocketUserMessage Message { get; set; }
+        public IResult Result { get; set; }
 
         public CommandHandlingService(IServiceProvider services, CommandService commands, DiscordSocketClient client)
         {
@@ -62,7 +63,7 @@ namespace DiscordBot.Commands
 
             // Keep in mind that result does not indicate a return value
             // rather an object stating if the command executed successfully.
-            IResult result = await _commands.ExecuteAsync(
+            Result = await _commands.ExecuteAsync(
                 context: context,
                 argPos: argPos,
                 services: _services);
@@ -71,12 +72,12 @@ namespace DiscordBot.Commands
             // to be executed; however, this may not always be desired,
             // as it may clog up the request queue should a user spam a
             // command.
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 bool delay = false;
-                if (!delay && !result.IsSuccess)
+                if (!delay && !Result.IsSuccess)
                 {
-                    context.Channel.SendMessageAsync(result.ErrorReason);
+                    await context.Channel.SendMessageAsync(Result.ErrorReason);
                     Thread.Sleep(5000);
                     delay = true;
                 }

@@ -22,9 +22,8 @@ namespace DiscordBot.Commands
             }
             else
             {
-                IReadOnlyCollection<IMessage> messages = default;
-                messages = await Context.Channel.GetMessagesAsync(num).LastAsync();
-                string result = messages.Last().Content;
+                IReadOnlyCollection<IMessage> messages = await Context.Channel.GetMessagesAsync(num).LastAsync();
+                string result = messages.Last().GetJumpUrl();
 
                 await ReplyAsync(result);
             }
