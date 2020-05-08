@@ -23,9 +23,12 @@ namespace DiscordBot.Commands
             SteamService ss = new SteamService();
             (ulong, ulong, string) result = await ss.GetAnswerAsync(_commandService, game);
 
-            // Cleanup after task is done
-            await Context.Channel.DeleteMessageAsync(result.Item1);
-            await Context.Channel.DeleteMessageAsync(result.Item2);
+            if (!result.Item3.Equals("Game not found. Weird."))
+            {
+                // Cleanup after task is done
+                await Context.Channel.DeleteMessageAsync(result.Item1);
+                await Context.Channel.DeleteMessageAsync(result.Item2); 
+            }
 
             // Finally replys the link of the query
             await ReplyAsync(result.Item3);
