@@ -13,9 +13,12 @@ namespace DiscordBot.Commands
     public class DeleteMessages : ModuleBase<SocketCommandContext>
     {
         private readonly CommandHandlingService _commandService;
-        public DeleteMessages(CommandHandlingService commandService)
+        private readonly DeleteMessagesService _delete;
+
+        public DeleteMessages(CommandHandlingService commandService, DeleteMessagesService delete)
         {
             _commandService = commandService;
+            _delete = delete;
         }
 
         [Command("delete", RunMode = RunMode.Async)]
@@ -26,7 +29,6 @@ namespace DiscordBot.Commands
         public async Task DeleteAsync(ulong num, int amount = 100)
         {
             string reply = "";
-            DeleteMessagesService dms = new DeleteMessagesService();
             try
             {
                 // If the user types a count and not an ID, it converts the count to the specified ID and continues
@@ -35,7 +37,7 @@ namespace DiscordBot.Commands
                     IReadOnlyCollection<IMessage> message = await Context.Channel.GetMessagesAsync((int)num + 1).LastAsync();
                     num = message.Last().Id;
                 }
-                reply = await dms.DeleteTaskAsync(_commandService, num, amount);
+                reply = await _delete.DeleteTaskAsync(_commandService, num, amount);
             }
             catch (Exception ex)
             {

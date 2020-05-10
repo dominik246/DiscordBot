@@ -9,16 +9,16 @@ using System.Threading.Tasks;
 
 namespace DiscordBot.DiscordBot.Services
 {
-    class DeleteMessagesService
+    public class DeleteMessagesService
     {
-        public async Task<string> DeleteTaskAsync(CommandHandlingService commandService, ulong num, int n)
+        public async Task<string> DeleteTaskAsync(CommandHandlingService commandService, ulong id, int count)
         {
             string reply = "";
             await Task.Run(async () =>
             {
-                int counter = 0;
+                int deleteCounter = 0;
                 ulong latestMessageId = 0;
-                IMessage msgId = await commandService.Message.Channel.GetMessageAsync(num);
+                IMessage msgId = await commandService.Message.Channel.GetMessageAsync(id);
                 IReadOnlyCollection<IMessage> getLast100Messages = await commandService.Message.Channel.GetMessagesAsync().LastAsync();
 
                 // Ensures that message length of numMsg is greater than 0, therefore ensures that the message exists
@@ -27,13 +27,13 @@ namespace DiscordBot.DiscordBot.Services
                     do
                     {
                         // Automagically gets the latest message from the channel and deletes it
-                        latestMessageId = getLast100Messages.ElementAt(counter).Id;
-                        await getLast100Messages.ElementAt(counter).DeleteAsync();
+                        latestMessageId = getLast100Messages.ElementAt(deleteCounter).Id;
+                        await getLast100Messages.ElementAt(deleteCounter).DeleteAsync();
                         Thread.Sleep(500);
-                        counter++;
-                    } while (latestMessageId != num);
+                        deleteCounter++;
+                    } while (latestMessageId != id);
 
-                    reply = $"Successfully deleted {counter} messages.";
+                    reply = $"Successfully deleted {deleteCounter} messages.";
                 }
                 else
                 {
@@ -42,24 +42,24 @@ namespace DiscordBot.DiscordBot.Services
                         ulong authorId = msg.Author.Id;
                         ulong resultMsg = msg.Id;
 
-                        if (authorId.Equals(num))
+                        if (authorId.Equals(id))
                         {
                             await commandService.Message.Channel.DeleteMessageAsync(resultMsg);
                             Thread.Sleep(500);
-                            counter++;
+                            deleteCounter++;
                         }
-                        if (n.Equals(counter))
+                        if (count.Equals(deleteCounter))
                         {
                             // Counter is still by 1 short because it iterates from 0
-                            counter++;
+                            deleteCounter++;
                             break;
                         }
                     }
-                    reply = $"Successfully deleted {counter + 1} messages.";
+                    reply = $"Successfully deleted {deleteCounter + 1} messages.";
                 }
-                if (counter == 0)
+                if (deleteCounter == 0)
                 {
-                    reply = "0 messages found. Have you entered a valid message/user ID?";
+                    reply = "0 messages deleted. Have you entered a valid message/user ID?";
                 }
             });
             return reply;

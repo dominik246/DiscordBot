@@ -1,11 +1,11 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-
 using DiscordBot.Commands;
-
+using DiscordBot.DiscordBot.Handlers;
+using DiscordBot.DiscordBot.Services;
+using DiscordBot.Services;
 using Microsoft.Extensions.DependencyInjection;
-
 using System;
 using System.Threading.Tasks;
 
@@ -19,24 +19,25 @@ namespace DiscordBot
         {
             _client = new DiscordSocketClient(new DiscordSocketConfig
             {
-                ExclusiveBulkDelete = true
+                ExclusiveBulkDelete = true,
+                LogLevel = LogSeverity.Info
             });
-            _client.Log += Log;
+
 
             var services = BuildServiceProvider();
-            var client = services.GetRequiredService<DiscordSocketClient>();
-            services.GetRequiredService<CommandService>().Log += Log;
+            _client.Log += services.GetRequiredService<LogService>().LogClient;
 
             try
             {
                 await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DiscordToken"));
                 await _client.StartAsync();
+
                 // Here we initialize the logic required to register our commands.
                 await services.GetRequiredService<CommandHandlingService>().InstallCommandsAsync();
             }
             catch (Exception ex)
             {
-                await Log(new LogMessage(LogSeverity.Info, ex.Source, ex.Message));
+                Console.WriteLine(ex.Message);
             }
             finally
             {
@@ -44,18 +45,22 @@ namespace DiscordBot
             }
         }
 
-        private Task Log(LogMessage msg)
-        {
-            Console.WriteLine(msg.ToString());
-
-            return Task.CompletedTask;
-        }
-
-        public IServiceProvider BuildServiceProvider()
+        private IServiceProvider BuildServiceProvider()
             => new ServiceCollection()
             .AddSingleton(_client)
             .AddSingleton<CommandService>()
             .AddSingleton<CommandHandlingService>()
+            .AddSingleton<CommandExecutingService>()
+            .AddSingleton<DeleteMessagesService>()
+            .AddSingleton<SpamService>()
+            .AddSingleton<SteamService>()
+            .AddSingleton<IGoogleApiHelper, GoogleApiHelper>()
+            .AddSingleton<IReadFromFileHelper, ReadFromFileHelper>()
+            .AddSingleton<ILoggerHelper, LoggerHelper>()
+            .AddSingleton<IJsonHelper, JsonHelper>()
+            .AddSingleton<IEmbedHandler, EmbedHelper>()
+            .AddSingleton<IDmOwnerHelper, DmOwnerHelper>()
+            .AddSingleton<LogService>()
             .BuildServiceProvider();
 
     }

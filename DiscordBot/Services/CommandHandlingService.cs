@@ -1,9 +1,10 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
 
+using DiscordBot.DiscordBot.Services;
+
 using System;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace DiscordBot.Commands
@@ -13,14 +14,16 @@ namespace DiscordBot.Commands
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
+        private readonly CommandExecutingService _execution;
         public SocketUserMessage Message { get; set; }
         public IResult Result { get; set; }
 
-        public CommandHandlingService(IServiceProvider services, CommandService commands, DiscordSocketClient client)
+        public CommandHandlingService(IServiceProvider services, CommandService commands, DiscordSocketClient client, CommandExecutingService execution)
         {
             _commands = commands;
             _client = client;
             _services = services;
+            _execution = execution;
         }
 
         public async Task InstallCommandsAsync()
@@ -67,21 +70,6 @@ namespace DiscordBot.Commands
                 context: context,
                 argPos: argPos,
                 services: _services);
-
-            // Optionally, we may inform the user if the command fails
-            // to be executed; however, this may not always be desired,
-            // as it may clog up the request queue should a user spam a
-            // command.
-            await Task.Run(async () =>
-            {
-                bool delay = false;
-                if (!delay && !Result.IsSuccess)
-                {
-                    await context.Channel.SendMessageAsync(Result.ErrorReason);
-                    Thread.Sleep(5000);
-                    delay = true;
-                }
-            });
         }
     }
 }
