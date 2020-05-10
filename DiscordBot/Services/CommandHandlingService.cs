@@ -1,8 +1,5 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
-
-using DiscordBot.DiscordBot.Services;
-
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -14,16 +11,14 @@ namespace DiscordBot.Commands
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
-        private readonly CommandExecutingService _execution;
         public SocketUserMessage Message { get; set; }
         public IResult Result { get; set; }
 
-        public CommandHandlingService(IServiceProvider services, CommandService commands, DiscordSocketClient client, CommandExecutingService execution)
+        public CommandHandlingService(IServiceProvider services, CommandService commands, DiscordSocketClient client)
         {
             _commands = commands;
             _client = client;
             _services = services;
-            _execution = execution;
         }
 
         public async Task InstallCommandsAsync()

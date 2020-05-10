@@ -23,7 +23,6 @@ namespace DiscordBot
                 LogLevel = LogSeverity.Info
             });
 
-
             var services = BuildServiceProvider();
             _client.Log += services.GetRequiredService<LogService>().LogClient;
 
@@ -62,6 +61,5 @@ namespace DiscordBot
             .AddSingleton<IDmOwnerHelper, DmOwnerHelper>()
             .AddSingleton<LogService>()
             .BuildServiceProvider();
-
     }
 }

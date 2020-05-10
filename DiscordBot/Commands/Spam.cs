@@ -1,9 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
-
 using DiscordBot.DiscordBot.Handlers;
 using DiscordBot.DiscordBot.Services;
-
 using System.Threading.Tasks;
 
 namespace DiscordBot.Commands
@@ -32,7 +30,5 @@ namespace DiscordBot.Commands
             await _spam.SpamString(_commandService, _fileHandler, count);
             await ReplyAsync("``Finished!``");
         }
-
-
     }
 }
