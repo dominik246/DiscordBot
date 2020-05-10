@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DiscordBot.DiscordBot.Handlers
 {
-    //TODO: Make interface, generalize
+    //TODO: generalize
     public class JsonHelper : IJsonHelper
     {
         public async Task<List<(string, string)>> Parse(string json)

@@ -7,6 +7,6 @@ namespace DiscordBot.DiscordBot.Services
 {
     public interface ISpamService
     {
-        Task SpamString(CommandHandlingService commandService, IReadFromFileHelper fileHandler, uint count = 5);
+        Task SpamString(uint count);
     }
 }

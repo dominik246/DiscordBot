@@ -1,12 +1,12 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+
 using System;
 using System.Threading.Tasks;
 
 namespace DiscordBot.DiscordBot.Services
 {
-    //TODO: make interface
     public class DmOwnerHelper : IDmOwnerHelper
     {
         public async Task SendDm(DiscordSocketClient client, LogMessage message)

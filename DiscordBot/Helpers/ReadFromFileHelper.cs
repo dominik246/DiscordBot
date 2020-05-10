@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 
 namespace DiscordBot.DiscordBot.Handlers
 {
-    //TODO: make interface
+    //TODO: generalize
     public class ReadFromFileHelper : IReadFromFileHelper
     {
         private List<string> list = new List<string>();
 
         public async Task<List<string>> ReadAsync(uint counter)
         {
-            string solutionFolderPath = Directory.GetParent(Directory.GetCurrentDirectory()).FullName;
-            string filePath = solutionFolderPath + "//DiscordBot//json1//shakespeare_6.0_unformated_fixed.json.txt";
+            string solutionFolderPath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
+            string filePath = solutionFolderPath + "\\DiscordBot\\json\\shakespeare_6.0_unformated_fixed.json.txt";
             FileStream fs = new FileStream(path: filePath, mode: FileMode.Open, access: FileAccess.Read, share: FileShare.Read, bufferSize: 4096, useAsync: true);
             StreamReader sr = new StreamReader(fs);
 

@@ -1,9 +1,8 @@
-﻿using Discord.WebSocket;
-
+﻿using Discord;
+using Discord.WebSocket;
 using DiscordBot.Commands;
 using DiscordBot.DiscordBot.Handlers;
 using DiscordBot.DiscordBot.Services;
-
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,19 +12,21 @@ namespace DiscordBot.Services
     {
         private readonly IGoogleApiHelper _api;
         private readonly IJsonHelper _handler;
-        private readonly IEmbedHandler _embed;
+        private readonly IEmbedHelper _embed;
+        private readonly CommandHandlingService _commandService;
 
-        public SteamService(IGoogleApiHelper api, IJsonHelper handler, IEmbedHandler embed)
+        public SteamService(IGoogleApiHelper api, IJsonHelper handler, IEmbedHelper embed, CommandHandlingService commandService)
         {
             _api = api;
             _handler = handler;
             _embed = embed;
+            _commandService = commandService;
         }
 
-        public async Task<(ulong, ulong, string)> GetAnswerAsync(CommandHandlingService commandService, string game)
+        public async Task<(ulong, ulong, string)> GetAnswerAsync(string game)
         {
-            ulong newAuthor = commandService.Message.Author.Id + 1; // Needs to make sure authors don't match at the first iteration
-            SocketUser newAuthorAsSocketUser = commandService.Message.Author;
+            ulong newAuthor = _commandService.Message.Author.Id + 1; // Needs to make sure authors don't match at the first iteration
+            SocketUser newAuthorAsSocketUser = _commandService.Message.Author;
 
             ulong originalAuthor = 0;
             string originalMessage = "";
@@ -46,26 +47,29 @@ namespace DiscordBot.Services
                 // Sets newAuthor to the author of the newest message
                 if (originalAuthor != 0 && !originalMessage.Equals(newMessage))
                 {
-                    newAuthor = commandService.Message.Author.Id;
-                    newMessage = commandService.Message.Content;
+                    newAuthor = _commandService.Message.Author.Id;
+                    newMessage = _commandService.Message.Content;
                 }
                 // Only executes once so that it sets the user who originally initialized the command
-                if (!commandService.Message.Author.IsBot && originalAuthor == 0 && string.IsNullOrEmpty(originalMessage))
+                if (!_commandService.Message.Author.IsBot && originalAuthor == 0 && string.IsNullOrEmpty(originalMessage))
                 {
-                    originalAuthor = commandService.Message.Author.Id;
-                    originalMessage = commandService.Message.Content;
+                    originalAuthor = _commandService.Message.Author.Id;
+                    originalMessage = _commandService.Message.Content;
                 }
 
                 // Builds the embed and sends it to the channel
-                if (index.Equals(0))
+                if (index.Equals(0) && !jsonResult.Count.Equals(0))
                 {
-                    reply = await _embed.Build(commandService, jsonResult);
-                    firstDisposableMessage = commandService.Message.Id;
+                    Embed embed = await _embed.Build(_commandService, jsonResult, "Result of steam search:");
+                    await _commandService.Message.Channel.SendMessageAsync(text: "Which one?", embed: embed);
+                    firstDisposableMessage = _commandService.Message.Id;
                     index = 1;
                 }
 
-                if (reply == "Game not found. Weird.")
+                // Checks if there's nothing in the result, break out of the loop
+                if (jsonResult.Count.Equals(0))
                 {
+                    reply = "Game not found. Weird.";
                     break;
                 }
 
@@ -73,9 +77,9 @@ namespace DiscordBot.Services
                 if (originalAuthor != 0 && originalAuthor.Equals(newAuthor) && !newAuthorAsSocketUser.IsBot && !originalMessage.Equals(newMessage))
                 {
                     // Checks if it's a number and if the number is in the list
-                    if (int.TryParse(commandService.Message.Content, out int answer))
+                    if (int.TryParse(_commandService.Message.Content, out int answer))
                     {
-                        secondDisposableMessage = commandService.Message.Id;
+                        secondDisposableMessage = _commandService.Message.Id;
                         if (answer < jsonResult.Count)
                         {
                             reply = jsonResult[answer - 1].Item2;

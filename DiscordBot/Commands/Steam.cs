@@ -6,13 +6,10 @@ namespace DiscordBot.Commands
 {
     public class Steam : ModuleBase<SocketCommandContext>
     {
-        //TODO: push DI to SteamService
-        private readonly CommandHandlingService _commandService;
-        private readonly SteamService _service;
+        private readonly ISteamService _service;
 
-        public Steam(CommandHandlingService commandService, SteamService service)
+        public Steam(ISteamService service)
         {
-            _commandService = commandService;
             _service = service;
         }
 
@@ -21,7 +18,7 @@ namespace DiscordBot.Commands
         [Summary("Returns a steam game.")]
         public async Task SteamAsync([Summary("Game to search.")][Remainder] string game)
         {
-            (ulong, ulong, string) result = await _service.GetAnswerAsync(_commandService, game);
+            (ulong, ulong, string) result = await _service.GetAnswerAsync(game);
 
             if (!result.Item3.Equals("Game not found. Weird."))
             {

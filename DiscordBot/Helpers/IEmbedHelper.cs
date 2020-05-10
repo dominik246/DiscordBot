@@ -1,12 +1,12 @@
-﻿using DiscordBot.Commands;
-
+﻿using Discord;
+using DiscordBot.Commands;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DiscordBot.DiscordBot.Services
 {
-    public interface IEmbedHandler
+    public interface IEmbedHelper
     {
-        Task<string> Build(CommandHandlingService commandService, List<(string, string)> content);
+        Task<Embed> Build(CommandHandlingService commandService, List<(string, string)> content, string title = "");
     }
 }
