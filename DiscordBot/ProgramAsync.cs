@@ -24,7 +24,7 @@ namespace DiscordBot
             });
 
             var services = BuildServiceProvider();
-            _client.Log += services.GetRequiredService<LogService>().LogClient;
+            _client.Log += services.GetRequiredService<LogService>().Log;
 
             try
             {
@@ -49,7 +49,6 @@ namespace DiscordBot
             .AddSingleton(_client)
             .AddSingleton<CommandService>()
             .AddSingleton<CommandHandlingService>()
-            .AddSingleton<CommandExecutingService>()
             .AddSingleton<DeleteMessagesService>()
             .AddSingleton<ISpamService, SpamService>()
             .AddSingleton<ISteamService, SteamService>()
@@ -59,6 +58,7 @@ namespace DiscordBot
             .AddSingleton<IJsonHelper, JsonHelper>()
             .AddSingleton<IEmbedHelper, EmbedHelper>()
             .AddSingleton<IDmOwnerHelper, DmOwnerHelper>()
+            .AddSingleton<IEmbedHelper, EmbedHelper>()
             .AddSingleton<LogService>()
             .BuildServiceProvider();
     }

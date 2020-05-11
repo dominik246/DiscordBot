@@ -1,6 +1,5 @@
 ﻿using DiscordBot.DiscordBot.Helpers;
 using DiscordBot.DiscordBot.Helpers.JsonHelpers;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;

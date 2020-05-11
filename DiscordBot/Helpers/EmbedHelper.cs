@@ -9,7 +9,7 @@ namespace DiscordBot.DiscordBot.Services
 {
     public class EmbedHelper : IEmbedHelper
     {
-        public async Task<Embed> Build(CommandHandlingService commandService, List<(string, string)> content, string title)
+        public async Task<Embed> Build(List<(string, string)> content, string title)
         {
             int index = 0;
 
@@ -28,7 +28,6 @@ namespace DiscordBot.DiscordBot.Services
                     embed.AddField($"{++index}) ", s.Item1);
                 }
                 embed.WithColor(Color.Green);
-                //await commandService.Message.Channel.SendMessageAsync(text: "Which one?", embed: embed.Build());
             });
             return embed.Build();
         }

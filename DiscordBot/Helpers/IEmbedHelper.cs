@@ -7,6 +7,6 @@ namespace DiscordBot.DiscordBot.Services
 {
     public interface IEmbedHelper
     {
-        Task<Embed> Build(CommandHandlingService commandService, List<(string, string)> content, string title = "");
+        Task<Embed> Build(List<(string, string)> content, string title = "");
     }
 }
