@@ -1,5 +1,8 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
+
+using DiscordBot.DiscordBot.Services;
 
 using System;
 using System.Reflection;
@@ -12,14 +15,18 @@ namespace DiscordBot.Commands
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
+        private readonly LogService _logger;
         public SocketUserMessage Message { get; set; }
         public IResult Result { get; set; }
 
-        public CommandHandlingService(IServiceProvider services, CommandService commands, DiscordSocketClient client)
+        public CommandHandlingService(IServiceProvider services, CommandService commands, DiscordSocketClient client, LogService logger)
         {
             _commands = commands;
             _client = client;
             _services = services;
+            _logger = logger;
+
+            _commands.CommandExecuted += OnCommandExecutedAsync;
         }
 
         public async Task InstallCommandsAsync()
@@ -66,6 +73,15 @@ namespace DiscordBot.Commands
                 context: context,
                 argPos: argPos,
                 services: _services);
+        }
+
+        private async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
+        {
+            string commandName = command.IsSpecified ? command.Value.Name : "A command";
+
+            await _logger.Log(new LogMessage(LogSeverity.Info, "CommandExc", $"'{commandName}' was executed " +
+                $"at '{DateTime.Now}' by '{context.Message.Author.Username}#{context.Message.Author.Discriminator}' " +
+                $"in guild '{context.Guild.Name}'."));
         }
     }
 }
