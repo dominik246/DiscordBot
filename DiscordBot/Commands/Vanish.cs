@@ -16,6 +16,7 @@ namespace DiscordBot.DiscordBot.Commands
             _client = client;
         }
 
+        //TODO: make Service class
         [Command("vanish")]
         [Name("vanish")]
         [Summary("Gets offline or online")]

@@ -25,7 +25,7 @@ namespace DiscordBot.DiscordBot.Services
 
             List<(string, string)> list = new List<(string, string)>
                 {
-                    ("Exception: ", msg.Exception.Message)
+                    ("Exception: ", msg.Exception?.Message)
                 };
 
             Embed embed = await _embed.Build(list);

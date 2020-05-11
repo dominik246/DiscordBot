@@ -60,7 +60,7 @@ namespace DiscordBot.Services
                 // Builds the embed and sends it to the channel
                 if (index.Equals(0) && !jsonResult.Count.Equals(0))
                 {
-                    Embed embed = await _embed.Build(_commandService, jsonResult, "Result of steam search:");
+                    Embed embed = await _embed.Build(jsonResult, "Result of steam search:");
                     await _commandService.Message.Channel.SendMessageAsync(text: "Which one?", embed: embed);
                     firstDisposableMessage = _commandService.Message.Id;
                     index = 1;
