@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace DiscordBot.DiscordBot.Handlers
@@ -9,10 +7,10 @@ namespace DiscordBot.DiscordBot.Handlers
     //TODO: generalize
     public class JsonHelper : IJsonHelper
     {
-        public async Task<List<(string, string)>> Parse(string json)
+        public async Task<JArray> Parse(string json)
         {
+            JArray result = new JArray();
             JObject data = JObject.Parse(json);
-            List<(string, string)> itemList = new List<(string, string)>();
 
             await Task.Run(() =>
             {
@@ -21,16 +19,14 @@ namespace DiscordBot.DiscordBot.Handlers
                     foreach (JObject item in data["items"])
                     {
                         // Need to be sure it's a valid steam game link
-                        if (item["link"].ToString().StartsWith("https://store.steampowered.com/app/"))
+                        if (item["formattedUrl"].ToString().StartsWith("https://store.steampowered.com/app/"))
                         {
-                            string name = item["pagemap"]["product"].First()["name"].ToString();
-
-                            itemList.Add((name, item["link"].ToString()));
+                            result.Add(item);
                         }
                     }
                 }
             });
-            return itemList;
+            return result;
         }
     }
 }

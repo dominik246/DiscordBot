@@ -1,70 +1,76 @@
-﻿using DiscordBot.DiscordBot.Helpers;
+﻿using Discord;
+using Discord.WebSocket;
+
+using DiscordBot.DiscordBot.Helpers;
 using DiscordBot.DiscordBot.Helpers.JsonHelpers;
+
+using Newtonsoft.Json.Linq;
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace DiscordBot.DiscordBot.Services
 {
     public class ReminderService
     {
-        private JsonBuilderHelper _builder;
+        private readonly JsonConstructor _builder;
+        private readonly IGetDateFromString _getDate;
+        private readonly IEmbedHelper _embed;
 
-        public ReminderService(JsonBuilderHelper builder)
+        public ReminderService(JsonConstructor builder, IGetDateFromString getDate, IEmbedHelper embed)
         {
+            _getDate = getDate;
             _builder = builder;
+            _embed = embed;
         }
-        // TODO: check if the user forgot to type a timespan or mistyped it
-        public async Task SetReminder(string message, ulong authorId, DateTime startTime)
-        {
-            string[] messageArray = message.Split(separator: ' ', options: StringSplitOptions.RemoveEmptyEntries);
-            List<string> timeList = new List<string>();
 
-            foreach (string result in messageArray.Last().SplitAndKeepDelimiters(new char[] { 'd', 'h', 'm', 's' }))
+        public async Task<TimeSpan> SetReminder(SocketUserMessage message, string messageString)
+        {
+            (TimeSpan, string) offsetTimeSpan = await _getDate.GetTimeSpan(messageString);
+            DateTime UTCendDate = message.Timestamp.UtcDateTime + offsetTimeSpan.Item1;
+            DateTime localEndDate = message.Timestamp.LocalDateTime + offsetTimeSpan.Item1;
+
+
+            List<(string, string)> list = new List<(string, string)>()
             {
-                timeList.Add(result);
+                ("authorId", message.Author.Id.ToString()),
+                ("message", offsetTimeSpan.Item2),
+                ("localStartDate", message.Timestamp.LocalDateTime.ToString()),
+                ("localEndDate", localEndDate.ToString()),
+                ("UTCstartTime", message.Timestamp.UtcDateTime.ToString()),
+                ("UTCendDate", UTCendDate.ToString())
+            };
+
+            List<string> path = new List<string>()
+            {
+                "reminders", "users", message.Author.Id.ToString(), message.Id.ToString()
+            };
+
+            await _builder.Construct(path, list);
+            return offsetTimeSpan.Item1;
+        }
+
+        //TODO: make a GetReminders func
+        public async Task<Embed> GetReminders(SocketUserMessage message)
+        {
+            string solutionFolderPath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
+            string filePath = solutionFolderPath + "\\DiscordBot\\json\\reminder_storage.json";
+
+            List<(string, string)> list = new List<(string, string)>();
+            JObject json = JObject.Parse(await File.ReadAllTextAsync(filePath));
+
+            json = json["reminders"]["users"][message.Author.Id.ToString()] as JObject;
+
+            foreach (var o in json)
+            {
+                var endDateValue = o.Value.SelectToken("localEndDate").ToString();
+                var jMessage = o.Value.SelectToken("message").ToString();
+                list.Add((endDateValue, jMessage));
             }
 
-            int test = messageArray.Last().Length;
-            message = message[..^(messageArray.Last().Length + 1)];
-
-            // 12d,11h,10m,09s
-
-            int days = 0;
-            int hours = 0;
-            int minutes = 0;
-            int seconds = 0;
-
-            await Task.Run(() =>
-            {
-                for (int i = 0; i < timeList.Count; i++)
-                {
-                    string entry = timeList[i];
-
-                    if (entry.EndsWith('d'))
-                    {
-                        // -1 because you want to trim the last character in the string
-                        days = int.Parse(entry[0..(entry.Length - 1)]);
-                    }
-                    if (entry.EndsWith('h'))
-                    {
-                        hours = int.Parse(entry[0..(entry.Length - 1)]);
-                    }
-                    if (entry.EndsWith('m'))
-                    {
-                        minutes = int.Parse(entry[0..(entry.Length - 1)]);
-                    }
-                    if (entry.EndsWith('s'))
-                    {
-                        seconds = int.Parse(entry[0..(entry.Length - 1)]);
-                    }
-                }
-            });
-
-            TimeSpan offsetTimeSpan = new TimeSpan(days, hours, minutes, seconds);
-            DateTime finishDate = startTime + offsetTimeSpan;
-            await _builder.Build(author: authorId, message: message, finishDateTime: finishDate, startDateTime: startTime);
+            return await _embed.Build(list, "Reminders:");
         }
     }
 }

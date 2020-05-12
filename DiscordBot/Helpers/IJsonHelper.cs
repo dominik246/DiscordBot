@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
+
 using System.Threading.Tasks;
 
 namespace DiscordBot.DiscordBot.Handlers
 {
     public interface IJsonHelper
     {
-        Task<List<(string, string)>> Parse(string json);
+        Task<JArray> Parse(string json);
     }
 }

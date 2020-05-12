@@ -1,9 +1,14 @@
 ﻿using Discord;
 using Discord.WebSocket;
+
 using DiscordBot.Commands;
 using DiscordBot.DiscordBot.Handlers;
 using DiscordBot.DiscordBot.Services;
+
+using Newtonsoft.Json.Linq;
+
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DiscordBot.Services
@@ -39,7 +44,7 @@ namespace DiscordBot.Services
 
             // Searches for possible matches on steam and returns them as a json string
             string searchResult = await _api.GetResult(game);
-            List<(string, string)> jsonResult = await _handler.Parse(searchResult);
+            JArray jsonResult = await _handler.Parse(searchResult);
 
             while (true)
             {
@@ -60,14 +65,23 @@ namespace DiscordBot.Services
                 // Builds the embed and sends it to the channel
                 if (index.Equals(0) && !jsonResult.Count.Equals(0))
                 {
-                    Embed embed = await _embed.Build(jsonResult, "Result of steam search:");
+                    List<(string, string)> list = new List<(string, string)>();
+                    int listIterator = 0;
+
+                    foreach (var o in jsonResult)
+                    {
+                        string name = o.SelectToken("pagemap").SelectToken("product")[0].SelectToken("name").ToString();
+                        list.Add(($"{++listIterator}", name));
+                    }
+
+                    Embed embed = await _embed.Build(list, "Result of steam search:");
                     await _commandService.Message.Channel.SendMessageAsync(text: "Which one?", embed: embed);
                     firstDisposableMessage = _commandService.Message.Id;
                     index = 1;
                 }
 
                 // Checks if there's nothing in the result, break out of the loop
-                if (jsonResult.Count.Equals(0))
+                if (jsonResult.ToString().Equals(searchResult))
                 {
                     reply = "Game not found. Weird.";
                     break;
@@ -82,7 +96,7 @@ namespace DiscordBot.Services
                         secondDisposableMessage = _commandService.Message.Id;
                         if (answer < jsonResult.Count)
                         {
-                            reply = jsonResult[answer - 1].Item2;
+                            reply = jsonResult.AsJEnumerable().ElementAt(answer - 1).SelectToken("formattedUrl").ToString();
                             break;
                         }
                         else

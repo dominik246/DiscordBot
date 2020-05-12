@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -25,7 +26,7 @@ namespace DiscordBot.DiscordBot.Services
 
             List<(string, string)> list = new List<(string, string)>
                 {
-                    ("Exception: ", msg.Exception?.Message)
+                    ("Exception: ", msg.Exception?.Message ?? "No exception.")
                 };
 
             Embed embed = await _embed.Build(list);

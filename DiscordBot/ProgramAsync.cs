@@ -1,12 +1,16 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+
 using DiscordBot.Commands;
 using DiscordBot.DiscordBot.Handlers;
+using DiscordBot.DiscordBot.Helpers;
 using DiscordBot.DiscordBot.Helpers.JsonHelpers;
 using DiscordBot.DiscordBot.Services;
 using DiscordBot.Services;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using System;
 using System.Threading.Tasks;
 
@@ -62,7 +66,8 @@ namespace DiscordBot
             .AddSingleton<IEmbedHelper, EmbedHelper>()
             .AddSingleton<LogService>()
             .AddSingleton<ReminderService>()
-            .AddSingleton<JsonBuilderHelper>()
+            .AddSingleton<JsonConstructor>()
+            .AddSingleton<IGetDateFromString, GetDateFromString>()
             .BuildServiceProvider();
     }
 }

@@ -1,7 +1,5 @@
 ﻿using Discord;
 
-using DiscordBot.Commands;
-
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,10 +7,9 @@ namespace DiscordBot.DiscordBot.Services
 {
     public class EmbedHelper : IEmbedHelper
     {
-        public async Task<Embed> Build(List<(string, string)> content, string title)
+        public async Task<Embed> Build(List<(string, string)> content, string title, bool inline)
         {
             int index = 0;
-
             // Checks if we got any result back
             if (content?.Count < 1)
                 return new EmbedBuilder().AddField("Result: ", "Nothing has been found.").Build();
@@ -25,7 +22,7 @@ namespace DiscordBot.DiscordBot.Services
                 embed.WithTitle(title);
                 foreach ((string, string) s in content)
                 {
-                    embed.AddField($"{++index}) ", s.Item1);
+                    embed.AddField(s.Item1, s.Item2, inline);
                 }
                 embed.WithColor(Color.Green);
             });

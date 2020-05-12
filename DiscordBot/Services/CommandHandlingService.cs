@@ -79,9 +79,14 @@ namespace DiscordBot.Commands
         {
             string commandName = command.IsSpecified ? command.Value.Name : "A command";
 
+            if (context.Guild == null)
+            {
+
+            }
+
             await _logger.Log(new LogMessage(LogSeverity.Info, "CommandExc", $"'{commandName}' was executed " +
                 $"at '{DateTime.Now}' by '{context.Message.Author.Username}#{context.Message.Author.Discriminator}' " +
-                $"in guild '{context.Guild.Name}'."));
+                $"in guild '{context.Guild?.Name ?? "DM channel"}'."));
         }
     }
 }
