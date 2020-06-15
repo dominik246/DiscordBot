@@ -9,7 +9,6 @@ namespace DiscordBot.DiscordBot.Services
     {
         public async Task<Embed> Build(List<(string, string)> content, string title, bool inline)
         {
-            int index = 0;
             // Checks if we got any result back
             if (content?.Count < 1)
                 return new EmbedBuilder().AddField("Result: ", "Nothing has been found.").Build();

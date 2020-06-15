@@ -4,6 +4,7 @@ namespace DiscordBot.DiscordBot.Helpers
 {
     public static class StringHelper
     {
+        // TODO: Maintainability index is 59
         /// <summary>
         /// Splits the given string into a list of substrings, while outputting the splitting
         /// delimiters (each in its own string) as well. It's just like String.Split() except

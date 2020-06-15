@@ -7,6 +7,7 @@ namespace DiscordBot.DiscordBot.Helpers.JsonHelpers
 {
     public static class ValidateJson
     {
+        // TODO: Maintainability index is 62
         public static bool IsValidJson(this string strInput)
         {
             strInput = strInput.Trim();

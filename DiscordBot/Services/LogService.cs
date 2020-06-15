@@ -8,11 +8,11 @@ namespace DiscordBot.DiscordBot.Services
 {
     public class LogService
     {
-        private readonly IDmOwnerHelper _dm;
+        private readonly IDmHelper _dm;
         private readonly DiscordSocketClient _client;
         private readonly IEmbedHelper _embed;
         private readonly ILoggerHelper _handler;
-        public LogService(IDmOwnerHelper dm, DiscordSocketClient client, ILoggerHelper handler, IEmbedHelper embed)
+        public LogService(IDmHelper dm, DiscordSocketClient client, ILoggerHelper handler, IEmbedHelper embed)
         {
             _dm = dm;
             _client = client;

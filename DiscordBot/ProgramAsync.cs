@@ -1,16 +1,13 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-
 using DiscordBot.Commands;
 using DiscordBot.DiscordBot.Handlers;
 using DiscordBot.DiscordBot.Helpers;
 using DiscordBot.DiscordBot.Helpers.JsonHelpers;
 using DiscordBot.DiscordBot.Services;
 using DiscordBot.Services;
-
 using Microsoft.Extensions.DependencyInjection;
-
 using System;
 using System.Threading.Tasks;
 
@@ -38,6 +35,7 @@ namespace DiscordBot
 
                 // Here we initialize the logic required to register our commands.
                 await services.GetRequiredService<CommandHandlingService>().InstallCommandsAsync();
+                await services.GetRequiredService<TimerHelper>().Init();
             }
             catch (Exception ex)
             {
@@ -62,12 +60,14 @@ namespace DiscordBot
             .AddSingleton<ILoggerHelper, LoggerHelper>()
             .AddSingleton<IJsonHelper, JsonHelper>()
             .AddSingleton<IEmbedHelper, EmbedHelper>()
-            .AddSingleton<IDmOwnerHelper, DmOwnerHelper>()
+            .AddSingleton<IDmHelper, DmHelper>()
             .AddSingleton<IEmbedHelper, EmbedHelper>()
             .AddSingleton<LogService>()
             .AddSingleton<ReminderService>()
             .AddSingleton<JsonConstructor>()
             .AddSingleton<IGetDateFromString, GetDateFromString>()
+            .AddSingleton<ClientStatusService>()
+            .AddSingleton<TimerHelper>()
             .BuildServiceProvider();
     }
 }

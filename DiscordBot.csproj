@@ -12,13 +12,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0-preview.3.20215.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <Compile Remove="PythonBack\**" />
+    <EmbeddedResource Remove="PythonBack\**" />
+    <None Remove="PythonBack\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Helpers\" />
+    <PackageReference Include="Discord.Net" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0-preview.3.20215.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
 </Project>

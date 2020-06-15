@@ -8,6 +8,7 @@ namespace DiscordBot.DiscordBot.Helpers
     public class GetDateFromString : IGetDateFromString
     {
         // TODO: check if the user forgot to type a timespan or mistyped it
+        // TODO: Maintainability index is 50
         public async Task<(TimeSpan, string)> GetTimeSpan(string message)
         {
             string[] messageArray = message.Split(separator: ' ', options: StringSplitOptions.RemoveEmptyEntries);

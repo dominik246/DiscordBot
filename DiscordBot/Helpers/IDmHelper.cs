@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace DiscordBot.DiscordBot.Services
 {
-    public interface IDmOwnerHelper
+    public interface IDmHelper
     {
         Task SendDm(DiscordSocketClient client, LogMessage message, Embed embed);
+        Task SendDm(DiscordSocketClient client, ulong userId, Embed embed);
     }
 }

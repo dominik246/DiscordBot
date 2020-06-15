@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace DiscordBot.DiscordBot.Services
 {
-    public class DmOwnerHelper : IDmOwnerHelper
+    //TODO: check if the embed is larger than 2000 chars, if yes, split it
+    public class DmHelper : IDmHelper
     {
         public async Task SendDm(DiscordSocketClient client, LogMessage message, Embed embed)
         {
@@ -21,6 +22,12 @@ namespace DiscordBot.DiscordBot.Services
             }
 
             await commandException.Context.Channel.SendMessageAsync(message.Message);
+        }
+        
+        public async Task SendDm(DiscordSocketClient client, ulong userId, Embed embed)
+        {
+            Console.WriteLine("Sending message to owner!");
+            await client.GetUser(userId).SendMessageAsync(embed: embed);
         }
     }
 }

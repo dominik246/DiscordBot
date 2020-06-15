@@ -9,6 +9,7 @@ namespace DiscordBot.DiscordBot.Helpers.JsonHelpers
 {
     public class JsonConstructor
     {
+        // TODO: Maintainability index is 47
         public async Task Construct(List<string> path, List<(string, string)> context)
         {
             string solutionFolderPath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;

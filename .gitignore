@@ -10,7 +10,7 @@
 *.userosscache
 *.sln.docstates
 launchSettings.json
-reminder_storage.json
+reminder_storage.json*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
